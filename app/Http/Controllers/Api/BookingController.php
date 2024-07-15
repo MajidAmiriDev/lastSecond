@@ -9,7 +9,7 @@ use App\Models\Booking;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\BookingRequest;
 use App\Jobs\SendBookingConfirmation;
-
+use App\Notifications\AdminBookingNotification;
 
 class BookingController extends Controller
 {
@@ -36,6 +36,12 @@ class BookingController extends Controller
         $data['status'] = 'pending';
         $booking = Booking::create($data);
         SendBookingConfirmation::dispatch($booking);
+
+        $admin = User::where('email', 'admin@example.com')->first(); // Adjust to your admin's email
+        if ($admin) {
+            $admin->notify(new AdminBookingNotification($booking));
+        }
+        
         $activity->decrement('available_slots', $data['slots_booked']);
 
         return response()->json($booking, 201);
