@@ -70,4 +70,28 @@ class BookingController extends Controller
     {
         //
     }
+
+    public function cancel(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if ($booking->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized to cancel this booking.'], 403);
+        }
+
+        if ($booking->status == 'cancelled') {
+            return response()->json(['error' => 'Booking is already cancelled.'], 400);
+        }
+
+        $activity = Activity::findOrFail($booking->activity_id);
+
+        // Update booking status to 'cancelled'
+        $booking->update(['status' => 'cancelled']);
+
+        // Restore the available slots
+        $activity->increment('available_slots', $booking->slots_booked);
+
+        return response()->json(['message' => 'Booking has been cancelled.'], 200);
+    }
+    
 }
