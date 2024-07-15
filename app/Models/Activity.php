@@ -15,6 +15,7 @@ class Activity extends Model
         'location',
         'price',
         'available_slots',
+        'image_path',
     ];
 
     public function bookings()

@@ -27,6 +27,7 @@ class ActivityRequest extends FormRequest
             'location' => 'required|string|max:255',
             'price' => 'required|numeric',
             'available_slots' => 'required|integer',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
     /**

@@ -23,7 +23,14 @@ class ActivityController extends Controller
     public function store(ActivityRequest $request)
     {
 
-        $activity = Activity::create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('images', 'public');
+            $data['image_path'] = $path;
+        }
+
+        $activity = Activity::create($data);
         return response()->json($activity, 201);
     }
 
@@ -40,10 +47,23 @@ class ActivityController extends Controller
      */
     public function update(ActivityRequest $request, string $id)
     {
+        $data = $request->validated();
 
         $activity = Activity::findOrFail($id);
-        $activity->update($request);
-        
+
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($activity->image_path) {
+                Storage::disk('public')->delete($activity->image_path);
+            }
+
+            // Store the new image
+            $path = $request->file('image')->store('images', 'public');
+            $data['image_path'] = $path;
+        }
+
+        $activity->update($data);
+
         return response()->json($activity, 200);
     }
 
