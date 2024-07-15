@@ -77,4 +77,31 @@ class ActivityController extends Controller
 
         return response()->json(null, 204);
     }
+
+
+    public function search(Request $request)
+    {
+        $query = Activity::query();
+
+        if ($request->has('name')) {
+            $query->where('name', 'LIKE', '%' . $request->input('name') . '%');
+        }
+
+        if ($request->has('location')) {
+            $query->where('location', 'LIKE', '%' . $request->input('location') . '%');
+        }
+
+        if ($request->has('price_min')) {
+            $query->where('price', '>=', $request->input('price_min'));
+        }
+
+        if ($request->has('price_max')) {
+            $query->where('price', '<=', $request->input('price_max'));
+        }
+
+        $activities = $query->paginate(10);
+
+        return response()->json($activities);
+    }
+    
 }

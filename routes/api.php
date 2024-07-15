@@ -11,3 +11,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 Route::apiResource('activities', ActivityController::class);
 Route::post('/bookings', [BookingController::class, 'store']);
+Route::get('activities/search', [ActivityController::class, 'search']);
